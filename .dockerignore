@@ -1,0 +1,28 @@
+# Allowlist: use this repository, never its parent workspace, as build context.
+**
+!package.json
+!package-lock.json
+!index.html
+!tsconfig*.json
+!vite.config.ts
+!nginx.conf
+!src/
+!src/**
+!public/
+!public/**
+
+# These remain excluded even if accidentally added under an allowed directory.
+**/.env
+**/.env.*
+**/.git
+**/.git/**
+**/node_modules
+**/node_modules/**
+**/work
+**/work/**
+**/credentials
+**/credentials/**
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx

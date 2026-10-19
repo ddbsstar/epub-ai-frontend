@@ -8,18 +8,42 @@
   },
   "scripts": {
     "dev": "vite",
+    "typecheck": "vue-tsc -b",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build": "vue-tsc -b && vite build",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.42"
+    "@tanstack/vue-query": "^5.104.4",
+    "axios": "^1.20.0",
+    "pinia": "^4.1.0",
+    "vue": "^3.5.42",
+    "vue-router": "^5.4.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.5.1",
     "@vue/tsconfig": "^0.9.1",
+    "axios-mock-adapter": "^2.1.0",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.11.1",
+    "globals": "^17.13.0",
+    "jsdom": "^30.1.3",
+    "prettier": "^3.9.10",
     "typescript": "~6.0.2",
+    "typescript-eslint": "^8.71.2",
     "vite": "^8.3.0",
+    "vitest": "^5.0.5",
     "vue-tsc": "^3.3.11"
   }
 }
