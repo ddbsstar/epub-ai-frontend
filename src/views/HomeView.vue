@@ -1,55 +1,459 @@
 <script setup lang="ts">
-import BackendHealthStatus from '@/components/BackendHealthStatus.vue'
+import KindlePreview from '@/components/KindlePreview.vue'
+import { publicEnv } from '@/config/env'
+
+const features = [
+  {
+    number: '01',
+    title: '整理章节与段落',
+    description: '统一标题、章首与引文，\n让适用的版式重新有序。',
+    note: 'A SENSE OF STRUCTURE',
+  },
+  {
+    number: '02',
+    title: '保留阅读器里的习惯',
+    description: '正文大小、字体与行距，\n仍由你的阅读器调整。',
+    note: 'READ YOUR OWN WAY',
+  },
+  {
+    number: '03',
+    title: '版式焕新，原文保留',
+    description: '保留文字、图片与目录，\n专注改变阅读呈现。',
+    note: 'SAME WORDS, NEW FEELING',
+  },
+]
 </script>
 
 <template>
-  <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow">让好内容，拥有好版式</p>
-        <h1 id="hero-title">
-          每一本书，<br />都值得<span class="title-accent">被好好排版。</span>
-        </h1>
-        <p class="hero-description">
-          用 AI 理解一本书的结构与气质，<br />让章节、正文与细节，自然地统一起来。
+  <main class="epub-main">
+    <section class="epub-hero" aria-labelledby="epub-title">
+      <div class="epub-hero-copy">
+        <div class="epub-eyebrow">
+          <span aria-hidden="true"></span>EPUB 排版 · 为日常阅读整理细节
+          <span v-if="publicEnv.publicBeta" class="epub-beta-badge">公开试用</span>
+        </div>
+        <h1 id="epub-title">让喜欢的书，<br /><span>更漂亮，更统一。</span></h1>
+        <p class="epub-description">
+          上传已有 EPUB，整理一本书的阅读节奏。<br />
+          统一适用的标题、引文与章节细节，复杂内容保留原样。
         </p>
-        <div class="project-note">
-          <span class="note-line"></span>
-          <p>项目已起步。<span>从一页漂亮的书，开始。</span></p>
+        <div class="epub-actions" aria-label="功能入口">
+          <RouterLink class="epub-action epub-primary" :to="{ name: 'upload' }">
+            开始美化
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 12h15m-6-6 6 6-6 6" />
+            </svg>
+          </RouterLink>
+          <button class="epub-action epub-secondary" type="button" disabled>
+            查看排版效果
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 18 18 6M6 6h12v12" />
+            </svg>
+          </button>
         </div>
-        <div class="principles" aria-label="产品设计目标">
-          <span>保留原文</span><span>统一风格</span><span>专注阅读</span>
+        <div class="epub-hero-footnote">
+          <span class="epub-fine-star" aria-hidden="true">✳</span>
+          <span>当前提供一套统一排版 · 不改写原文</span>
         </div>
       </div>
-
-      <div class="book-scene" aria-label="书籍版式静态示意，尚未接入 EPUB 处理">
-        <div class="book-backdrop"></div>
-        <article class="sample-page">
-          <div class="running-header"><span>雨后的远行</span><span>THE QUIET JOURNEY</span></div>
-          <div class="chapter-mark">第 七 章</div>
-          <h2>归途</h2>
-          <div class="chapter-divider" aria-hidden="true"><span></span><i>✦</i><span></span></div>
-          <p class="sample-lead">雨停的时候，山间重新有了光。</p>
-          <p>他把书合上，望向窗外。屋檐上的水滴沿着旧日的节奏落下，远处的小路，慢慢从雾里显现。</p>
-          <p>
-            有些旅程并不为了抵达。走过长长的路，我们才学会，在平常的日子里，看见微小而确定的美。
-          </p>
-          <div class="page-footer"><span></span><span>07</span><span></span></div>
-        </article>
-        <div class="sample-caption"><span class="caption-rule"></span>版式示意 · 原创样章</div>
-      </div>
+      <KindlePreview />
     </section>
-
-    <BackendHealthStatus />
-
-    <section class="next-step" aria-labelledby="next-heading">
-      <div>
-        <span class="section-number">01 / NEXT</span>
-        <h2 id="next-heading">下一步，让一本真实的书跑通流程。</h2>
+    <section class="epub-features" aria-labelledby="epub-features-title">
+      <div class="epub-features-heading">
+        <h2 id="epub-features-title">好版式，藏在每一个细节里。</h2>
+        <span>SMALL DETAILS. A BETTER READ.</span>
       </div>
-      <p>
-        上传 EPUB、AI 设计、排版预览与导出将在后续接入。<br />当前页面用于验证前后端连接，书页为静态设计示意。
-      </p>
+      <div class="epub-feature-row">
+        <article v-for="feature in features" :key="feature.number" class="epub-feature">
+          <span class="epub-feature-number">{{ feature.number }}<i aria-hidden="true"></i></span>
+          <div class="epub-feature-content">
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.description }}</p>
+            <span>{{ feature.note }}</span>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
 </template>
+
+<style scoped>
+.epub-main {
+  width: 100%;
+  max-width: 1296px;
+  margin: 0 auto;
+  flex: 1;
+}
+.epub-hero {
+  min-height: 670px;
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  align-items: center;
+  gap: 28px;
+}
+.epub-hero-copy {
+  position: relative;
+  padding-bottom: 11px;
+}
+.epub-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #787566;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  margin-bottom: 34px;
+}
+.epub-eyebrow > span {
+  display: block;
+  width: 25px;
+  height: 1px;
+  background: var(--epub-copper);
+}
+.epub-eyebrow > .epub-beta-badge {
+  width: auto;
+  height: auto;
+  padding: 3px 6px;
+  border: 1px solid #c6c9b9;
+  border-radius: 2px;
+  background: transparent;
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.epub-hero h1 {
+  font-family: var(--epub-serif);
+  font-size: clamp(42px, 4.5vw, 65px);
+  font-weight: 500;
+  line-height: 1.38;
+  letter-spacing: -2px;
+}
+.epub-hero h1 > span {
+  color: var(--epub-copper);
+}
+.epub-description {
+  font-size: 15px;
+  line-height: 2.1;
+  color: #74776a;
+  margin-top: 29px;
+  letter-spacing: 0.15px;
+}
+.epub-actions {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 35px;
+}
+.epub-actions > .epub-action {
+  text-decoration: none;
+  height: 50px;
+  padding: 0 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 26px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border-radius: 2px;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+}
+.epub-actions > .epub-action > svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.epub-primary {
+  color: #f9f7ef;
+  background: var(--epub-ink);
+  border: 1px solid var(--epub-ink);
+}
+.epub-primary:hover {
+  background: #414536;
+  border-color: #414536;
+  transform: translateY(-2px);
+}
+.epub-secondary {
+  color: var(--epub-ink);
+  background: transparent;
+  border: 1px solid #c8c9b9;
+}
+.epub-secondary:hover {
+  background: #edece1;
+  border-color: #a6aa97;
+  transform: translateY(-2px);
+}
+.epub-hero-footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 33px;
+  color: #8e9181;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+.epub-fine-star {
+  color: #a4a58e;
+  font-size: 16px;
+  line-height: 1;
+}
+.epub-features {
+  border-top: 1px solid #c5c8b6;
+  border-bottom: 1px solid var(--epub-line);
+  padding: 27px 0 33px;
+  scroll-margin-top: 24px;
+}
+.epub-features-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 29px;
+}
+.epub-features-heading > h2 {
+  font-family: var(--epub-serif);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+.epub-features-heading > span {
+  font-size: 7px;
+  letter-spacing: 1.8px;
+  color: #999f8a;
+}
+.epub-feature-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.epub-feature {
+  min-width: 0;
+  display: flex;
+  gap: 23px;
+  padding-right: 35px;
+}
+.epub-feature + .epub-feature {
+  padding-left: 39px;
+  border-left: 1px solid var(--epub-line);
+}
+.epub-feature-number {
+  flex-shrink: 0;
+  color: var(--epub-copper);
+  font-family: var(--epub-serif);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.5;
+  padding-top: 1px;
+}
+.epub-feature-number > i {
+  display: block;
+  width: 13px;
+  height: 1px;
+  background: #c3b498;
+  margin-top: 9px;
+}
+.epub-feature-content h3 {
+  font-family: var(--epub-serif);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  line-height: 1.5;
+}
+.epub-feature-content p {
+  white-space: pre-line;
+  font-size: 11px;
+  line-height: 1.95;
+  color: #858a78;
+  margin-top: 9px;
+}
+.epub-feature-content > span {
+  display: block;
+  font-size: 6.5px;
+  letter-spacing: 1.4px;
+  color: #a3a891;
+  margin-top: 14px;
+}
+@media (max-width: 1190px) and (min-width: 801px) {
+  .epub-hero {
+    grid-template-columns: 1.12fr 1fr;
+    gap: 8px;
+    min-height: 640px;
+  }
+  .epub-hero h1 {
+    font-size: clamp(37px, 4.4vw, 52px);
+    letter-spacing: -1.6px;
+  }
+  .epub-eyebrow {
+    font-size: 9px;
+    gap: 8px;
+    letter-spacing: 0.3px;
+  }
+  .epub-description {
+    font-size: 12px;
+  }
+  .epub-actions {
+    gap: 9px;
+  }
+  .epub-actions > .epub-action {
+    padding: 0 14px;
+    gap: 13px;
+    font-size: 11px;
+  }
+  .epub-feature {
+    gap: 14px;
+    padding-right: 18px;
+  }
+  .epub-feature + .epub-feature {
+    padding-left: 21px;
+  }
+  .epub-feature-content h3 {
+    font-size: 14px;
+  }
+  .epub-feature-content p {
+    font-size: 10px;
+  }
+}
+@media (max-width: 800px) {
+  .epub-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    min-height: 0;
+  }
+  .epub-hero-copy {
+    padding: 63px 0 14px;
+  }
+  .epub-eyebrow {
+    margin-bottom: 24px;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+  }
+  .epub-hero h1 {
+    font-size: clamp(37px, 6.8vw, 56px);
+    line-height: 1.4;
+    letter-spacing: -1.5px;
+  }
+  .epub-description {
+    font-size: 13px;
+    margin-top: 24px;
+  }
+  .epub-actions {
+    margin-top: 29px;
+    gap: 12px;
+  }
+  .epub-actions > .epub-action {
+    height: 48px;
+    padding: 0 21px;
+    gap: 25px;
+    font-size: 12px;
+  }
+  .epub-hero-footnote {
+    margin-top: 26px;
+    font-size: 9px;
+  }
+  .epub-features {
+    padding: 29px 0 0;
+    margin-top: 25px;
+  }
+  .epub-features-heading {
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 22px;
+  }
+  .epub-features-heading > h2 {
+    font-size: 14px;
+  }
+  .epub-features-heading > span {
+    max-width: 100px;
+    font-size: 6px;
+    line-height: 1.8;
+    text-align: right;
+    letter-spacing: 1.2px;
+  }
+  .epub-feature-row {
+    display: block;
+  }
+  .epub-feature,
+  .epub-feature + .epub-feature {
+    border-left: 0;
+    padding: 25px 0;
+    gap: 22px;
+  }
+  .epub-feature + .epub-feature {
+    border-top: 1px solid var(--epub-line);
+  }
+  .epub-feature-number {
+    padding-top: 1px;
+    min-width: 23px;
+  }
+  .epub-feature-content h3 {
+    font-size: 18px;
+  }
+  .epub-feature-content p {
+    white-space: normal;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .epub-feature-content > span {
+    margin-top: 11px;
+  }
+}
+@media (max-width: 400px) {
+  .epub-hero-copy {
+    padding-top: 47px;
+  }
+  .epub-eyebrow {
+    font-size: 8.7px;
+    gap: 8px;
+    letter-spacing: 0;
+  }
+  .epub-eyebrow > span {
+    width: 17px;
+  }
+  .epub-hero h1 {
+    font-size: 35px;
+    letter-spacing: -1.8px;
+  }
+  .epub-description {
+    font-size: 11px;
+    line-height: 2.05;
+  }
+  .epub-actions {
+    gap: 8px;
+  }
+  .epub-actions > .epub-action {
+    padding: 0 13px;
+    gap: 14px;
+    font-size: 10px;
+    height: 45px;
+  }
+  .epub-actions > .epub-action > svg {
+    width: 15px;
+    height: 15px;
+  }
+  .epub-hero-footnote {
+    font-size: 8px;
+    gap: 6px;
+  }
+  .epub-features-heading > h2 {
+    font-size: 12px;
+  }
+  .epub-features-heading > span {
+    font-size: 5px;
+    max-width: 82px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .epub-primary:hover,
+  .epub-secondary:hover {
+    transform: none;
+  }
+}
+.epub-actions > .epub-action:disabled {
+  cursor: default;
+}
+</style>

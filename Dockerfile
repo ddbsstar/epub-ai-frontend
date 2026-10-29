@@ -6,7 +6,9 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 # Only public, non-secret browser configuration may be supplied at build time.
 ARG VITE_API_BASE_URL=/api
+ARG VITE_PUBLIC_BETA=false
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_PUBLIC_BETA=${VITE_PUBLIC_BETA}
 RUN npm run build
 
 FROM nginx:1.30.6-alpine AS runtime

@@ -106,3 +106,164 @@ const dependencies = computed(() => {
     </div>
   </section>
 </template>
+
+<style scoped>
+.workspace-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: #fcfcf7;
+  border: 1px solid #e1e4d7;
+  border-radius: 5px;
+  padding: 24px 28px;
+}
+.status-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.status-symbol {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  background: #ecefe5;
+  color: #6a8064;
+  border-radius: 7px;
+  flex-shrink: 0;
+}
+.status-symbol.disconnected {
+  color: #a97b50;
+  background: #f4eee1;
+}
+.status-symbol svg {
+  width: 24px;
+  height: 24px;
+}
+.status-summary h2 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 3px;
+}
+.status-summary p {
+  color: #87907e;
+  margin: 0;
+  font-size: 12px;
+}
+.status-controls {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.connection-detail {
+  display: grid;
+  gap: 3px;
+  justify-items: end;
+}
+.connection-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #5e7b54;
+}
+.connection-label i {
+  background: currentColor;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.connection-label.checking {
+  color: #7b836d;
+}
+.connection-label.disconnected {
+  color: #a5794b;
+}
+.last-checked {
+  font-size: 10px;
+  color: #9b9f91;
+  font-variant-numeric: tabular-nums;
+}
+.refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: #52634c;
+  font-size: 12px;
+  border: 1px solid #d7ddcc;
+  border-radius: 4px;
+  padding: 9px 13px;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+  white-space: nowrap;
+}
+.refresh-button:not(:disabled):hover {
+  border-color: #9eac91;
+  background: #f1f3e9;
+}
+.refresh-button svg {
+  width: 17px;
+  height: 17px;
+}
+.spinning {
+  animation: spin 1s linear infinite;
+}
+@media (max-width: 1000px) {
+  .workspace-status {
+    padding: 22px;
+  }
+  .status-summary p {
+    max-width: 240px;
+  }
+  .status-controls {
+    gap: 18px;
+  }
+}
+@media (max-width: 720px) {
+  .workspace-status {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 21px;
+  }
+  .status-summary p {
+    max-width: none;
+  }
+  .status-controls {
+    justify-content: space-between;
+    border-top: 1px solid #e8ebdf;
+    padding-top: 17px;
+  }
+  .connection-detail {
+    justify-items: start;
+  }
+}
+.dependency-list {
+  display: flex;
+  gap: 6px 15px;
+  flex-wrap: wrap;
+  margin: 7px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  color: #6f7c64;
+}
+.status-summary .request-id {
+  margin-top: 5px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinning {
+    animation: none;
+  }
+}
+</style>

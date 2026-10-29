@@ -9,6 +9,15 @@ describe('public configuration', () => {
     )
   })
 
+  it('limits the public beta notice to 20 MiB while preserving the local 100 MiB policy', () => {
+    expect(parsePublicEnv({})).toMatchObject({ publicBeta: false, uploadMaxMiB: 100 })
+    expect(parsePublicEnv({ VITE_PUBLIC_BETA: 'true' })).toMatchObject({
+      publicBeta: true,
+      uploadMaxMiB: 20,
+    })
+    expect(() => parsePublicEnv({ VITE_PUBLIC_BETA: 'yes' })).toThrow()
+  })
+
   it.each([
     '//untrusted.example.com',
     'https://user:pass@example.com/api',

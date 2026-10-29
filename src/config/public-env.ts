@@ -21,6 +21,7 @@ function isApiBaseUrl(value: string): boolean {
 }
 
 const publicEnvSchema = z.object({
+  VITE_PUBLIC_BETA: z.enum(['true', 'false']).default('false'),
   VITE_API_BASE_URL: z
     .string()
     .trim()
@@ -31,5 +32,10 @@ const publicEnvSchema = z.object({
 
 export function parsePublicEnv(env: Record<string, unknown>) {
   const parsed = publicEnvSchema.parse(env)
-  return { apiBaseUrl: parsed.VITE_API_BASE_URL.replace(/\/$/u, '') || '/' }
+  const publicBeta = parsed.VITE_PUBLIC_BETA === 'true'
+  return {
+    apiBaseUrl: parsed.VITE_API_BASE_URL.replace(/\/$/u, '') || '/',
+    publicBeta,
+    uploadMaxMiB: publicBeta ? 20 : 100,
+  }
 }
