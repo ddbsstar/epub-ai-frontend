@@ -9,6 +9,12 @@
 - Run `npm run check` before submitting changes. Keep protocol, error, router and query-state tests meaningful.
 - Deployment and the same-origin `/api` proxy are documented in `docs/deployment.md`; API routes must never fall back to the SPA's HTML.
 
+## Git collaboration
+
+- User requirement: every new feature, fix and documentation change must use a new branch and a pull request targeting `main`. Never commit or push changes directly to `main`, force-push it or bypass protection.
+- Start from the current `origin/main`, keep changes scoped, run appropriate checks and open a reviewable PR. Merge only with explicit user authorization.
+- GitHub protects `main`, including administrators: PRs and passing code/container checks are required; force pushes and branch deletion are disabled.
+
 ## Public typography beta
 
 2026-10-29: Public trial is https://epub.199.30.89.47.sslip.io/ on the shared server with Caddy serving dist and same-origin API. Production build uses VITE_PUBLIC_BETA=true,20MiB uploads,24h retention; no model/illustration trial routes/chunks. Preserve local experiments in development. Include public/licenses OFL files with font distribution. Backend actual operations are documented in its docs/public-beta-deployment.md. No formal login, cross-browser recovery or device fidelity is promised. Current checked build deployed without Git commit/push.
