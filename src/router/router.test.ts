@@ -14,6 +14,22 @@ afterEach(() => {
 })
 
 describe('page routing', () => {
+  it('provides a public feedback route with a reachable form anchor without accepting arbitrary selectors', () => {
+    const router = createAppRouter(createMemoryHistory())
+    expect(router.resolve('/about').name).toBe('about')
+    expect(router.resolve('/about').meta.title).toBe('About this beta & feedback · EPUB AI')
+    const scroll = router.options.scrollBehavior!
+    const namedRoute = (url: string) => {
+      const route = router.resolve(url)
+      if (!route.name) throw new Error('Expected a named route')
+      return { ...route, name: route.name }
+    }
+    expect(scroll(namedRoute('/about#feedback'), namedRoute('/'), null)).toEqual({
+      el: '#feedback',
+      top: 24,
+    })
+    expect(scroll(namedRoute('/about#[invalid'), namedRoute('/'), null)).toEqual({ top: 0 })
+  })
   it('excludes the illustration experiment from production routes and keeps it available in development', () => {
     vi.stubEnv('DEV', false)
     expect(createAppRouter(createMemoryHistory()).resolve('/illustrate').name).toBe('not-found')

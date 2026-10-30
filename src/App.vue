@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { copy } from '@/content/en'
+import { supportCopy } from '@/content/support-en'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -19,11 +20,19 @@ const isUploadPage = computed(() => ['upload', 'illustrate'].includes(String(rou
         </svg>
         <span>EPUB <span class="epub-brand-ai">AI</span></span>
       </RouterLink>
-      <nav v-if="isUploadPage" class="epub-nav epub-breadcrumb" :aria-label="copy.breadcrumbLabel">
+      <nav
+        v-if="isUploadPage || route.name === 'about'"
+        class="epub-nav epub-breadcrumb"
+        :aria-label="copy.breadcrumbLabel"
+      >
         <RouterLink :to="{ name: 'home' }">{{ copy.home }}</RouterLink>
         <span class="epub-nav-divider" aria-hidden="true">/</span>
         <span aria-current="page">{{
-          route.name === 'illustrate' ? copy.illustrationLab : copy.start
+          route.name === 'about'
+            ? supportCopy.link
+            : route.name === 'illustrate'
+              ? copy.illustrationLab
+              : copy.start
         }}</span>
       </nav>
       <nav v-else class="epub-nav" :aria-label="copy.navLabel">
@@ -35,6 +44,7 @@ const isUploadPage = computed(() => ['upload', 'illustrate'].includes(String(rou
     <RouterView />
     <footer class="epub-footer">
       <span>EPUB AI<span class="epub-footer-dot">·</span>MADE FOR THE LOVE OF READING</span>
+      <RouterLink class="epub-info-link" :to="{ name: 'about' }">{{ supportCopy.link }}</RouterLink>
       <span>{{ copy.footer }}</span>
     </footer>
   </div>
@@ -131,12 +141,23 @@ const isUploadPage = computed(() => ['upload', 'illustrate'].includes(String(rou
   min-height: 79px;
   margin: 0 auto;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
   color: #949b86;
   font-size: 8px;
   letter-spacing: 0.9px;
+}
+.epub-info-link {
+  color: #68705c;
+  font-size: 10px;
+  text-underline-offset: 4px;
+  line-height: 1.7;
+}
+.epub-info-link:focus-visible {
+  outline: 2px solid var(--epub-copper);
+  outline-offset: 4px;
 }
 .epub-footer > span:first-child {
   font-size: 7px;

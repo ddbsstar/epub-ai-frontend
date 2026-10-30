@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { copy } from '@/content/en'
+import { supportCopy } from '@/content/support-en'
 import KindlePreview from '@/components/KindlePreview.vue'
 import { publicEnv } from '@/config/env'
 
@@ -58,6 +59,9 @@ const features = [
           <span class="epub-fine-star" aria-hidden="true">✳</span>
           <span>{{ copy.oneStyle }}</span>
         </div>
+        <RouterLink class="home-beta-info" :to="{ name: 'about' }">{{
+          supportCopy.link
+        }}</RouterLink>
       </div>
       <KindlePreview />
     </section>
@@ -206,6 +210,17 @@ const features = [
   color: #a4a58e;
   font-size: 16px;
   line-height: 1;
+}
+.home-beta-info {
+  display: inline-block;
+  margin-top: 16px;
+  color: #74776a;
+  font-size: 11px;
+  text-underline-offset: 4px;
+}
+.home-beta-info:focus-visible {
+  outline: 2px solid var(--epub-copper);
+  outline-offset: 4px;
 }
 .epub-features {
   border-top: 1px solid #c5c8b6;

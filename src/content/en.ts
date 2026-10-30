@@ -96,8 +96,6 @@ export const copy = {
   progressTag: 'Original text · Consistent typography',
   uploadUnknown:
     'The upload result is unconfirmed. Select the file again; it will not be uploaded again automatically.',
-  feedbackHint:
-    'Keep the request ID and share it with the person who invited you to try this beta.',
   confirmSubmission: 'Check previous submission',
   restoreProgress: 'Resume progress check',
   chooseAnother: 'Choose another book',
@@ -183,6 +181,16 @@ export const copy = {
 
 // Stable API codes are mapped locally; upstream messages never reach the public UI.
 export const publicErrorMessages: Record<string, string> = {
+  FEEDBACK_DISABLED:
+    'Feedback is not enabled on this service. No new feedback can be submitted here.',
+  INVALID_FEEDBACK: 'Check the feedback fields and keep the description within 1,000 characters.',
+  FEEDBACK_OWNER_LIMIT:
+    'This browser session has reached the feedback limit. Try again after retained feedback expires.',
+  FEEDBACK_CAPACITY_EXCEEDED: 'Feedback storage is temporarily full. Try again later.',
+  FEEDBACK_UNAVAILABLE:
+    'Feedback storage is temporarily unavailable. Check this submission before trying again.',
+  INVALID_IDEMPOTENCY_KEY:
+    'The submission ID is invalid. Reload the page before creating new feedback.',
   VALIDATION_ERROR: 'Some submitted information is invalid. Check it and try again.',
   BAD_REQUEST: 'This request could not be processed. Check it and try again.',
   NOT_FOUND: 'The requested resource is unavailable.',

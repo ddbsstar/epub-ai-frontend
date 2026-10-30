@@ -1,4 +1,5 @@
 import { copy } from '@/content/en'
+import { supportCopy } from '@/content/support-en'
 import { createRouter, createWebHistory, type RouterHistory } from 'vue-router'
 
 export function createAppRouter(
@@ -12,6 +13,12 @@ export function createAppRouter(
         name: 'home',
         component: () => import('@/views/HomeView.vue'),
         meta: { title: copy.homePageTitle },
+      },
+      {
+        path: '/about',
+        name: 'about',
+        component: () => import('@/views/AboutView.vue'),
+        meta: { title: supportCopy.pageTitle },
       },
       {
         path: '/upload',
@@ -36,6 +43,7 @@ export function createAppRouter(
         meta: { title: copy.notFoundPageTitle },
       },
     ],
-    scrollBehavior: () => ({ top: 0 }),
+    scrollBehavior: (to) =>
+      to.name === 'about' && to.hash === '#feedback' ? { el: '#feedback', top: 24 } : { top: 0 },
   })
 }

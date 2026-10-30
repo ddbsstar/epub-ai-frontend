@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { copy } from '@/content/en'
+import { supportCopy } from '@/content/support-en'
 import { computed, ref } from 'vue'
 import UploadBookCover from '@/components/UploadBookCover.vue'
 import { ApiError, publicErrorMessage } from '@/api/errors'
@@ -341,8 +342,8 @@ function onDrop(event: DragEvent) {
           <p v-if="uploadMutation.isError.value">
             {{ copy.uploadUnknown }}
           </p>
-          <p v-if="publicEnv.publicBeta && requestId">
-            {{ copy.feedbackHint }}
+          <p>
+            <a class="upload-feedback-link" href="/about#feedback">{{ supportCopy.errorLink }}</a>
           </p>
         </div>
         <div class="upload-run-actions">
@@ -411,6 +412,14 @@ function onDrop(event: DragEvent) {
   color: #77796b;
   font-size: 11px;
   line-height: 1.8;
+}
+.upload-feedback-link {
+  color: var(--epub-copper);
+  text-underline-offset: 4px;
+}
+.upload-feedback-link:focus-visible {
+  outline: 2px solid var(--epub-copper);
+  outline-offset: 4px;
 }
 .typography-summary {
   border-top: 1px solid #deded1;
