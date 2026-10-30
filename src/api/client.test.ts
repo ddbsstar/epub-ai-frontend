@@ -38,7 +38,7 @@ describe('API protocol boundary', () => {
       code: 'INTERNAL_ERROR',
       status: 500,
       requestId: 'trace-456',
-      message: '服务暂时异常，请稍后重试。',
+      message: 'The service is temporarily unavailable. Try again later.',
     })
   })
 
@@ -49,7 +49,7 @@ describe('API protocol boundary', () => {
     await expect(request()).rejects.toMatchObject({
       code: 'HTTP_502',
       requestId: 'gateway-789',
-      message: '请求失败，请稍后重试。',
+      message: 'The request failed. Try again later.',
     })
   })
 
