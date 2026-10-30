@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { copy } from '@/content/en'
+import { supportCopy } from '@/content/support-en'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -9,7 +11,7 @@ const isUploadPage = computed(() => ['upload', 'illustrate'].includes(String(rou
 <template>
   <div class="epub-page" :class="{ 'epub-page--upload': isUploadPage }">
     <header class="epub-header">
-      <RouterLink class="epub-brand" :to="{ name: 'home' }" aria-label="EPUB AI 首页">
+      <RouterLink class="epub-brand" :to="{ name: 'home' }" :aria-label="copy.homeLabel">
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
           <path
             d="M4 6h7a6 6 0 0 1 6 6v15a9 9 0 0 0-6-3H4V6ZM28 6h-5a6 6 0 0 0-6 6v15a9 9 0 0 1 6-3h5V6Z"
@@ -18,21 +20,32 @@ const isUploadPage = computed(() => ['upload', 'illustrate'].includes(String(rou
         </svg>
         <span>EPUB <span class="epub-brand-ai">AI</span></span>
       </RouterLink>
-      <nav v-if="isUploadPage" class="epub-nav epub-breadcrumb" aria-label="当前位置">
-        <RouterLink :to="{ name: 'home' }">首页</RouterLink>
+      <nav
+        v-if="isUploadPage || route.name === 'about'"
+        class="epub-nav epub-breadcrumb"
+        :aria-label="copy.breadcrumbLabel"
+      >
+        <RouterLink :to="{ name: 'home' }">{{ copy.home }}</RouterLink>
         <span class="epub-nav-divider" aria-hidden="true">/</span>
-        <span aria-current="page">{{ route.name === 'illustrate' ? '插画实验' : '开始美化' }}</span>
+        <span aria-current="page">{{
+          route.name === 'about'
+            ? supportCopy.link
+            : route.name === 'illustrate'
+              ? copy.illustrationLab
+              : copy.start
+        }}</span>
       </nav>
-      <nav v-else class="epub-nav" aria-label="页面导航（静态示意）">
-        <button type="button" disabled>排版效果</button>
+      <nav v-else class="epub-nav" :aria-label="copy.navLabel">
+        <button type="button" disabled>{{ copy.examples }}</button>
         <span class="epub-nav-divider" aria-hidden="true">/</span>
-        <button type="button" disabled>产品亮点</button>
+        <button type="button" disabled>{{ copy.features }}</button>
       </nav>
     </header>
     <RouterView />
     <footer class="epub-footer">
       <span>EPUB AI<span class="epub-footer-dot">·</span>MADE FOR THE LOVE OF READING</span>
-      <span>给每一本喜欢的书，一份好看的版式。</span>
+      <RouterLink class="epub-info-link" :to="{ name: 'about' }">{{ supportCopy.link }}</RouterLink>
+      <span>{{ copy.footer }}</span>
     </footer>
   </div>
 </template>
@@ -128,12 +141,23 @@ const isUploadPage = computed(() => ['upload', 'illustrate'].includes(String(rou
   min-height: 79px;
   margin: 0 auto;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
   color: #949b86;
   font-size: 8px;
   letter-spacing: 0.9px;
+}
+.epub-info-link {
+  color: #68705c;
+  font-size: 10px;
+  text-underline-offset: 4px;
+  line-height: 1.7;
+}
+.epub-info-link:focus-visible {
+  outline: 2px solid var(--epub-copper);
+  outline-offset: 4px;
 }
 .epub-footer > span:first-child {
   font-size: 7px;

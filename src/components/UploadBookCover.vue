@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { copy } from '@/content/en'
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
@@ -16,7 +17,10 @@ watch(
 </script>
 
 <template>
-  <figure class="upload-cover-stage" :aria-label="title ? `《${title}》书籍封面` : '等待上传书籍'">
+  <figure
+    class="upload-cover-stage"
+    :aria-label="title ? copy.coverLabel(title) : copy.coverWaiting"
+  >
     <span class="upload-cover-kicker" aria-hidden="true">A SMALL CHANGE. A QUIETER READ.</span>
     <div class="upload-book-object" aria-hidden="true">
       <div class="upload-book-pages"></div>
@@ -33,7 +37,7 @@ watch(
             title ? 'YOUR ORIGINAL BOOK' : 'A NEW CHAPTER'
           }}</span>
           <div class="upload-cover-title" :class="{ 'has-book-title': title }">
-            {{ title || '等待你的书' }}
+            {{ title || copy.coverTitle }}
           </div>
           <div class="upload-cover-rule"><i></i><span>✧</span><i></i></div>
           <svg class="upload-botanical" viewBox="0 0 170 210" fill="none">
@@ -46,17 +50,17 @@ watch(
             <path d="M52 189c12 4 22 4 30 1" />
           </svg>
           <p class="upload-cover-bottom">
-            {{ title ? '保留文字，整理阅读的细节。' : '下一段阅读，从这里开始。' }}
+            {{ title ? copy.coverWords : copy.coverBegin }}
           </p>
           <span class="upload-cover-imprint"
-            >EPUB AI <i>/</i> {{ title ? '书籍占位封面' : '等待上传' }}</span
+            >EPUB AI <i>/</i> {{ title ? copy.coverPlaceholder : copy.coverUpload }}</span
           >
         </template>
       </div>
     </div>
     <div class="upload-book-shadow" aria-hidden="true"></div>
     <figcaption class="upload-cover-caption">
-      {{ imageFailed ? '封面暂时无法显示 · 使用占位封面' : caption || '上传后显示书名与原书封面' }}
+      {{ imageFailed ? copy.coverFailed : caption || copy.coverCaption }}
     </figcaption>
   </figure>
 </template>

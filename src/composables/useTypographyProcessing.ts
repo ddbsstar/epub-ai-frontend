@@ -1,3 +1,4 @@
+import { copy } from '@/content/en'
 import { computed, ref } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { z } from 'zod'
@@ -72,7 +73,7 @@ export function useTypographyProcessing() {
   }
   function assertBook(run: EpubRun) {
     if (!receipt.value || run.bookId !== receipt.value.bookId)
-      throw new ApiError('INVALID_RESPONSE', '排版任务与当前书籍不匹配。')
+      throw new ApiError('INVALID_RESPONSE', copy.bookMismatch)
     return run
   }
   const runQuery = useQuery({

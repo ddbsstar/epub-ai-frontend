@@ -31,7 +31,7 @@ export const runFixture = {
 afterEach(() => mock.reset())
 
 describe('EPUB protocol', () => {
-  it('validates editorial coverage without counting headings or separators as paragraphs', () => {
+  it('validates legacy editorial coverage without counting headings or hr separators as paragraphs', () => {
     const typography = {
       profile: 'editorial-1',
       totalParagraphs: 12,
@@ -65,6 +65,64 @@ describe('EPUB protocol', () => {
       Object.entries(summary).filter(([key]) => key !== 'typography'),
     )
     expect(epubRunSchema.safeParse({ ...runFixture, summary: legacySummary }).success).toBe(true)
+  })
+
+  it('accepts paragraph separators in exact coverage while excluding hr separators from paragraph counts', async () => {
+    const typography = {
+      profile: 'editorial-1',
+      totalParagraphs: 640,
+      styledParagraphs: 635,
+      preservedParagraphs: 5,
+      styledHeadings: 12,
+      styledSeparatorParagraphs: 3,
+      roleCounts: { body: 608, opening: 11, quote: 0, poem: 13, caption: 0, note: 0, separator: 5 },
+    }
+    const summary = {
+      chapters: 4,
+      styledChapters: 3,
+      preservedChapters: 1,
+      bodyBytesPreserved: true,
+      formatErrors: 0,
+      formatWarnings: 0,
+      typography,
+    }
+    mock
+      .onGet('/v1/runs/run-123')
+      .reply(200, { data: { ...runFixture, summary }, meta: { requestId: 'separator-counts' } })
+    await expect(getEpubRun('run-123')).resolves.toMatchObject({ summary: { typography } })
+    for (const invalid of [
+      { ...typography, styledSeparatorParagraphs: 2 },
+      { ...typography, styledSeparatorParagraphs: 6 },
+      { ...typography, styledSeparatorParagraphs: -1 },
+      { ...typography, styledSeparatorParagraphs: 1.5 },
+      { ...typography, styledSeparatorParagraphs: undefined },
+      { ...typography, styledParagraphs: 637, preservedParagraphs: 3 },
+      { ...typography, roleCounts: { ...typography.roleCounts, separator: 2 } },
+    ])
+      expect(
+        epubRunSchema.safeParse({ ...runFixture, summary: { ...summary, typography: invalid } })
+          .success,
+      ).toBe(false)
+
+    const noParagraphSeparators = {
+      ...typography,
+      styledParagraphs: 632,
+      preservedParagraphs: 8,
+      styledSeparatorParagraphs: 0,
+    }
+    expect(
+      epubRunSchema.safeParse({
+        ...runFixture,
+        summary: { ...summary, typography: noParagraphSeparators },
+      }).success,
+    ).toBe(true)
+    const legacyHrOnly = Object.fromEntries(
+      Object.entries(noParagraphSeparators).filter(([key]) => key !== 'styledSeparatorParagraphs'),
+    )
+    expect(
+      epubRunSchema.safeParse({ ...runFixture, summary: { ...summary, typography: legacyHrOnly } })
+        .success,
+    ).toBe(true)
   })
 
   it('uses an explicit editorial theme while retaining the legacy default and idempotency binding', async () => {
@@ -164,7 +222,7 @@ describe('EPUB protocol', () => {
   })
 
   it('rejects empty, wrong-format and oversized files before uploading', () => {
-    expect(validateEpubFile(new File([], 'empty.epub'))).toContain('空')
+    expect(validateEpubFile(new File([], 'empty.epub'))).toContain('empty')
     expect(validateEpubFile(new File(['x'], 'book.zip'))).toContain('EPUB')
     const large = new File(['x'], 'large.epub')
     Object.defineProperty(large, 'size', { value: MAX_EPUB_BYTES + 1 })

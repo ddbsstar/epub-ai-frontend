@@ -1,3 +1,4 @@
+import { copy } from '@/content/en'
 import { z } from 'zod'
 import { apiRequest } from './client'
 import { ApiError } from './errors'
@@ -12,6 +13,7 @@ const typographySchema = z
     styledParagraphs: units,
     preservedParagraphs: units,
     styledHeadings: units,
+    styledSeparatorParagraphs: units.optional(),
     roleCounts: z.object({
       body: units,
       opening: units,
@@ -25,12 +27,14 @@ const typographySchema = z
   .refine(
     (summary) =>
       summary.styledParagraphs + summary.preservedParagraphs === summary.totalParagraphs &&
+      (summary.styledSeparatorParagraphs ?? 0) <= summary.roleCounts.separator &&
       summary.roleCounts.body +
         summary.roleCounts.opening +
         summary.roleCounts.quote +
         summary.roleCounts.poem +
         summary.roleCounts.caption +
-        summary.roleCounts.note ===
+        summary.roleCounts.note +
+        (summary.styledSeparatorParagraphs ?? 0) ===
         summary.styledParagraphs,
     'Invalid typography paragraph counts',
   )
@@ -95,9 +99,9 @@ export function isTerminalRun(run: EpubRun): boolean {
 }
 
 export function validateEpubFile(file: File, maxBytes = MAX_EPUB_BYTES): string | null {
-  if (!file.name.toLowerCase().endsWith('.epub')) return '请选择 EPUB 格式的文件。'
-  if (file.size === 0) return '这份文件是空的，请重新选择。'
-  if (file.size > maxBytes) return `文件超过 ${maxBytes / (1024 * 1024)} MiB，请选择较小的 EPUB。`
+  if (!file.name.toLowerCase().endsWith('.epub')) return copy.fileFormat
+  if (file.size === 0) return copy.fileEmpty
+  if (file.size > maxBytes) return copy.fileTooLarge(maxBytes / (1024 * 1024))
   return null
 }
 
@@ -131,7 +135,7 @@ export async function createEpubExport(
     },
     epubRunSchema,
   )
-  if (run.bookId !== bookId) throw new ApiError('INVALID_RESPONSE', '排版任务与当前书籍不匹配。')
+  if (run.bookId !== bookId) throw new ApiError('INVALID_RESPONSE', copy.bookMismatch)
   return run
 }
 
@@ -140,7 +144,7 @@ export async function getEpubRun(runId: string, signal?: AbortSignal) {
     { url: `/v1/runs/${encodeURIComponent(runId)}`, signal, withCredentials: true },
     epubRunSchema,
   )
-  if (run.id !== runId) throw new ApiError('INVALID_RESPONSE', '返回的排版任务不匹配。')
+  if (run.id !== runId) throw new ApiError('INVALID_RESPONSE', copy.runMismatch)
   return run
 }
 
@@ -149,6 +153,6 @@ export async function cancelEpubRun(runId: string) {
     { method: 'POST', url: `/v1/runs/${encodeURIComponent(runId)}/cancel`, withCredentials: true },
     epubRunSchema,
   )
-  if (run.id !== runId) throw new ApiError('INVALID_RESPONSE', '返回的排版任务不匹配。')
+  if (run.id !== runId) throw new ApiError('INVALID_RESPONSE', copy.runMismatch)
   return run
 }

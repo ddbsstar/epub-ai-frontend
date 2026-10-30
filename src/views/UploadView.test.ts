@@ -96,11 +96,11 @@ describe('explicit no-model typography workflow', () => {
     sessionStorage.setItem('epub-book-conversion-v1', oldConversion)
     sessionStorage.setItem('epub-active-run-v1', 'old-ai-run')
     const view = mountPage()
-    expect(view.text()).toContain('等待开始')
-    expect(view.text()).toContain('不调用模型')
+    expect(view.text()).toContain('Your next read is waiting')
+    expect(view.text()).toContain('No model calls')
     expect(view.find('.chapter-selection').exists()).toBe(false)
     expect(view.find('.chapter-gallery').exists()).toBe(false)
-    expect(button(view, '开始排版').attributes('disabled')).toBeDefined()
+    expect(button(view, 'Start formatting').attributes('disabled')).toBeDefined()
     expect(view.get('[role="progressbar"]').attributes('aria-valuenow')).toBeUndefined()
     expect(mock.history.get).toHaveLength(0)
     expect(mock.history.post).toHaveLength(0)
@@ -114,13 +114,13 @@ describe('explicit no-model typography workflow', () => {
     mock.onGet(getUrl).reply(200, envelope(finished))
     const view = mountPage()
     await chooseFile(view)
-    await vi.waitFor(() => expect(view.text()).toContain('原书已上传，点击开始排版'))
+    await vi.waitFor(() => expect(view.text()).toContain('Book uploaded. Select Start formatting'))
     expect(view.text()).toContain(receipt.originalName)
-    expect(button(view, '开始排版').attributes('disabled')).toBeUndefined()
+    expect(button(view, 'Start formatting').attributes('disabled')).toBeUndefined()
     expect(mock.history.post.map((request) => request.url)).toEqual(['/v1/uploads'])
     expect(mock.history.get).toHaveLength(0)
-    await button(view, '开始排版').trigger('click')
-    await vi.waitFor(() => expect(view.text()).toContain('正在检查格式与正文完整性'))
+    await button(view, 'Start formatting').trigger('click')
+    await vi.waitFor(() => expect(view.text()).toContain('Checking format and original content'))
     expect(view.get('[role="progressbar"]').attributes('aria-valuenow')).toBe('1')
     expect(view.get('input[type="file"]').attributes('disabled')).toBeDefined()
     await vi.waitFor(() => expect(view.find('a.upload-download').exists()).toBe(true), {
@@ -131,15 +131,17 @@ describe('explicit no-model typography workflow', () => {
     expect(mock.history.get.every((request) => request.url === getUrl)).toBe(true)
     expect(view.get('a.upload-download').attributes('href')).toBe(finished.artifacts.epub)
     expect(view.get('.upload-cover-image').attributes('src')).toBe(finished.artifacts.cover)
-    expect(view.get('[aria-label="排版覆盖统计"]').text()).toContain('8正文文档应用排版')
-    expect(view.text()).toContain('应用排版 90 段')
-    expect(view.text()).toContain('保留原样 10 段')
-    expect(view.text()).toContain('整理标题 7 个')
-    expect(view.text()).toContain('原书封面 · 未替换')
+    expect(view.get('[aria-label="Typography coverage"]').text()).toContain(
+      '8body documents styled',
+    )
+    expect(view.text()).toContain('90 styled')
+    expect(view.text()).toContain('10 unchanged')
+    expect(view.text()).toContain('7 headings styled')
+    expect(view.text()).toContain('Original cover · Unchanged')
     expect(
       view
         .findAll('a')
-        .find((entry) => entry.text() === '下载排版报告')
+        .find((entry) => entry.text() === 'Download typography report')
         ?.attributes('href'),
     ).toBe(finished.artifacts.report)
     expect(view.get('[role="progressbar"]').attributes('aria-valuenow')).toBe('3')
@@ -149,9 +151,41 @@ describe('explicit no-model typography workflow', () => {
     save(null, false)
     const view = mountPage()
     expect(view.text()).toContain(receipt.originalName)
-    expect(button(view, '开始排版').attributes('disabled')).toBeUndefined()
+    expect(button(view, 'Start formatting').attributes('disabled')).toBeUndefined()
     expect(mock.history.get).toHaveLength(0)
     expect(mock.history.post).toHaveLength(0)
+  })
+  it('keeps a long original filename and non-English title intact within the English workflow', async () => {
+    const originalName = `${'An extremely long original filename '.repeat(8)}原书.epub`
+    mock.onPost('/v1/uploads').reply(201, envelope({ ...receipt, originalName }))
+    const view = mountPage()
+    await chooseFile(view, new File(['sample'], originalName))
+    await vi.waitFor(() => expect(view.get('.upload-drop-title').text()).toBe(originalName))
+    expect(view.get('.upload-cover-title').text()).toBe(originalName.replace(/\.epub$/u, ''))
+    expect(view.get('figure').attributes('aria-label')).toBe(
+      `Book cover: ${originalName.replace(/\.epub$/u, '')}`,
+    )
+    expect(view.get('input[type="file"]').attributes('aria-label')).toBe('Choose an EPUB file')
+    expect(mock.history.post.map((request) => request.url)).toEqual(['/v1/uploads'])
+  })
+  it('shows an English safe fallback and request ID for an unknown server error without its Chinese raw text', async () => {
+    mock.onPost('/v1/uploads').reply(503, {
+      error: {
+        code: 'FUTURE_SERVER_FAILURE',
+        message: '内部错误：数据库密码与原书路径不可公开',
+        details: { privatePath: '/private/book.epub' },
+      },
+      meta: { requestId: 'english-fallback-123' },
+    })
+    const view = mountPage()
+    await chooseFile(view)
+    await vi.waitFor(() => expect(view.find('[role="alert"]').exists()).toBe(true))
+    const alert = view.get('[role="alert"]').text()
+    expect(alert).toContain('The request failed. Try again later.')
+    expect(alert).toContain('Request ID: english-fallback-123')
+    expect(alert).not.toMatch(/\p{Script=Han}/u)
+    expect(alert).not.toContain('/private/book.epub')
+    expect(mock.history.post).toHaveLength(1)
   })
   it('restores a known task through GET only and reports zero styling honestly', async () => {
     save(run.id)
@@ -182,9 +216,11 @@ describe('explicit no-model typography workflow', () => {
       }),
     )
     const view = mountPage()
-    await vi.waitFor(() => expect(view.text()).toContain('这本书未应用新的排版'))
-    expect(view.text()).toContain('0 个正文文档应用了新样式')
-    expect(view.text()).toContain('导出成功不代表视觉发生变化')
+    await vi.waitFor(() =>
+      expect(view.text()).toContain('No new typography was applied to this book'),
+    )
+    expect(view.text()).toContain('0 body documents received new styles')
+    expect(view.text()).toContain('A successful export does not mean the appearance changed')
     expect(view.find('a.upload-download').exists()).toBe(true)
     expect(mock.history.post).toHaveLength(0)
     expect(mock.history.get.map((request) => request.url)).toEqual([getUrl])
@@ -195,14 +231,16 @@ describe('explicit no-model typography workflow', () => {
     mock.onPost(createUrl).reply(202, envelope(finished))
     mock.onGet(getUrl).reply(200, envelope(finished))
     const view = mountPage()
-    await button(view, '开始排版').trigger('click')
-    await vi.waitFor(() => expect(view.text()).toContain('上次排版提交结果尚未确认'))
+    await button(view, 'Start formatting').trigger('click')
+    await vi.waitFor(() =>
+      expect(view.text()).toContain('Your previous submission is not confirmed yet'),
+    )
     expect(view.get('input[type="file"]').attributes('disabled')).toBeDefined()
-    expect(button(view, '开始排版').attributes('disabled')).toBeDefined()
+    expect(button(view, 'Start formatting').attributes('disabled')).toBeDefined()
     expect(mock.history.post).toHaveLength(1)
     await chooseFile(view, new File(['other'], '另一册.epub'))
     expect(mock.history.post).toHaveLength(1)
-    await button(view, '确认上次提交结果').trigger('click')
+    await button(view, 'Check previous submission').trigger('click')
     await vi.waitFor(() => expect(view.find('a.upload-download').exists()).toBe(true))
     expect(mock.history.post.map((request) => request.headers?.['Idempotency-Key'])).toEqual([
       key,
@@ -220,10 +258,10 @@ describe('explicit no-model typography workflow', () => {
     mock.onPost(createUrl).reply(202, envelope(finished))
     mock.onGet(getUrl).reply(200, envelope(finished))
     const view = mountPage()
-    expect(view.text()).toContain('上次排版提交结果尚未确认')
+    expect(view.text()).toContain('Your previous submission is not confirmed yet')
     expect(mock.history.get).toHaveLength(0)
     expect(mock.history.post).toHaveLength(0)
-    await button(view, '确认上次提交结果').trigger('click')
+    await button(view, 'Check previous submission').trigger('click')
     await vi.waitFor(() => expect(view.find('a.upload-download').exists()).toBe(true))
     expect(mock.history.post[0]!.headers?.['Idempotency-Key']).toBe(key)
   })
@@ -235,10 +273,10 @@ describe('explicit no-model typography workflow', () => {
     })
     mock.onGet(getUrl).reply(200, envelope(finished))
     const view = mountPage()
-    await vi.waitFor(() => expect(view.text()).toContain('排版进度暂时无法读取'))
+    await vi.waitFor(() => expect(view.text()).toContain('Progress is temporarily unavailable'))
     expect(view.text()).not.toContain('private upstream detail')
     expect(view.get('input[type="file"]').attributes('disabled')).toBeDefined()
-    await button(view, '恢复排版进度查询').trigger('click')
+    await button(view, 'Resume progress check').trigger('click')
     await vi.waitFor(() => expect(view.find('a.upload-download').exists()).toBe(true))
     expect(mock.history.get).toHaveLength(2)
     expect(mock.history.post).toHaveLength(0)
@@ -254,8 +292,10 @@ describe('explicit no-model typography workflow', () => {
       }),
     )
     const view = mountPage()
-    await vi.waitFor(() => expect(view.text()).toContain('这次排版未能完成'))
-    expect(view.text()).toContain('书内资源引用失效')
+    await vi.waitFor(() =>
+      expect(view.text()).toContain('This formatting task could not be completed'),
+    )
+    expect(view.text()).toContain('A book resource reference is broken or missing')
     expect(view.text()).not.toContain('private path')
     expect(view.find('a.upload-download').exists()).toBe(false)
     expect(view.get('input[type="file"]').attributes('disabled')).toBeUndefined()
@@ -266,10 +306,10 @@ describe('explicit no-model typography workflow', () => {
     mock.onGet(getUrl).reply(200, envelope(run))
     mock.onPost(`${getUrl}/cancel`).reply(200, envelope(run))
     const view = mountPage()
-    await vi.waitFor(() => expect(view.text()).toContain('停止本次排版'))
-    await button(view, '停止本次排版').trigger('click')
-    await vi.waitFor(() => expect(view.text()).toContain('等待后台停止'))
-    expect(view.text()).not.toContain('这次排版已停止')
+    await vi.waitFor(() => expect(view.text()).toContain('Stop formatting'))
+    await button(view, 'Stop formatting').trigger('click')
+    await vi.waitFor(() => expect(view.text()).toContain('Waiting for the server to stop'))
+    expect(view.text()).not.toContain('This formatting task has stopped')
     expect(view.get('input[type="file"]').attributes('disabled')).toBeDefined()
     expect(mock.history.post.map((request) => request.url)).toEqual([`${getUrl}/cancel`])
   })
@@ -280,8 +320,8 @@ describe('explicit no-model typography workflow', () => {
       meta: { requestId: 'missing-run' },
     })
     const view = mountPage()
-    await vi.waitFor(() => expect(view.text()).toContain('选择另一本书'))
-    await button(view, '选择另一本书').trigger('click')
+    await vi.waitFor(() => expect(view.text()).toContain('Choose another book'))
+    await button(view, 'Choose another book').trigger('click')
     expect(view.get('input[type="file"]').attributes('disabled')).toBeUndefined()
     expect(sessionStorage.getItem(storageKey)).toBeNull()
     expect(mock.history.post).toHaveLength(0)
@@ -290,22 +330,24 @@ describe('explicit no-model typography workflow', () => {
     save(run.id)
     mock.onGet(getUrl).reply(200, envelope({ ...finished, bookId: 'different-book' }))
     const view = mountPage()
-    await vi.waitFor(() => expect(view.text()).toContain('排版进度暂时无法读取'))
+    await vi.waitFor(() => expect(view.text()).toContain('Progress is temporarily unavailable'))
     expect(view.find('a.upload-download').exists()).toBe(false)
     expect(view.get('input[type="file"]').attributes('disabled')).toBeDefined()
-    expect(view.findAll('button').some((entry) => entry.text() === '选择另一本书')).toBe(false)
+    expect(view.findAll('button').some((entry) => entry.text() === 'Choose another book')).toBe(
+      false,
+    )
     expect(mock.history.post).toHaveLength(0)
   })
   it('accepts a single dropped EPUB without starting and rejects a wrong-format input before upload', async () => {
     mock.onPost('/v1/uploads').reply(201, envelope(receipt))
     const view = mountPage()
     await chooseFile(view, new File(['text'], 'notes.txt'))
-    expect(view.text()).toContain('请选择 EPUB 格式')
+    expect(view.text()).toContain('Choose a file in EPUB format')
     expect(mock.history.post).toHaveLength(0)
     await view
       .get('.upload-dropzone')
       .trigger('drop', { dataTransfer: { files: [new File(['sample'], receipt.originalName)] } })
-    await vi.waitFor(() => expect(view.text()).toContain('原书已上传，点击开始排版'))
+    await vi.waitFor(() => expect(view.text()).toContain('Book uploaded. Select Start formatting'))
     expect(mock.history.post.map((request) => request.url)).toEqual(['/v1/uploads'])
     expect(mock.history.get).toHaveLength(0)
   })

@@ -1,3 +1,4 @@
+import { copy } from '@/content/en'
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import { z } from 'zod'
 import { publicEnv } from '@/config/env'
@@ -36,7 +37,7 @@ export async function apiRequest<T>(
     const requestId = requestIdSchema.safeParse(response.headers['x-request-id'])
     throw new ApiError(
       'INVALID_RESPONSE',
-      '服务返回的数据格式异常，请稍后重试。',
+      copy.invalidResponse,
       response.status,
       requestId.success ? requestId.data : undefined,
     )
