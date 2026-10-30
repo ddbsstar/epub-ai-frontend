@@ -13,6 +13,7 @@ const typographySchema = z
     styledParagraphs: units,
     preservedParagraphs: units,
     styledHeadings: units,
+    styledSeparatorParagraphs: units.optional(),
     roleCounts: z.object({
       body: units,
       opening: units,
@@ -26,12 +27,14 @@ const typographySchema = z
   .refine(
     (summary) =>
       summary.styledParagraphs + summary.preservedParagraphs === summary.totalParagraphs &&
+      (summary.styledSeparatorParagraphs ?? 0) <= summary.roleCounts.separator &&
       summary.roleCounts.body +
         summary.roleCounts.opening +
         summary.roleCounts.quote +
         summary.roleCounts.poem +
         summary.roleCounts.caption +
-        summary.roleCounts.note ===
+        summary.roleCounts.note +
+        (summary.styledSeparatorParagraphs ?? 0) ===
         summary.styledParagraphs,
     'Invalid typography paragraph counts',
   )
