@@ -23,15 +23,15 @@ describe('public typography beta', () => {
       global: { plugins: [[VueQueryPlugin, { queryClient }]] },
     })
     try {
-      expect(wrapper.text()).toContain('公开试用')
-      expect(wrapper.text()).toContain('最大 20 MiB')
-      expect(wrapper.text()).toContain('上传 24 小时后自动删除')
+      expect(wrapper.text()).toContain('Public beta')
+      expect(wrapper.text()).toContain('Up to 20 MiB')
+      expect(wrapper.text()).toContain('deleted 24 hours after upload')
       const file = new File(['x'], 'large.epub')
       Object.defineProperty(file, 'size', { value: 20 * 1024 * 1024 + 1 })
       const field = wrapper.get<HTMLInputElement>('input[type="file"]')
       Object.defineProperty(field.element, 'files', { configurable: true, value: [file] })
       await field.trigger('change')
-      expect(wrapper.get('[role="alert"]').text()).toContain('文件超过 20 MiB')
+      expect(wrapper.get('[role="alert"]').text()).toContain('exceeds 20 MiB')
       expect(mock.history.post).toHaveLength(0)
       expect(mock.history.get).toHaveLength(0)
     } finally {

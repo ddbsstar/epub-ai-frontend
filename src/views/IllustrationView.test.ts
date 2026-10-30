@@ -703,7 +703,7 @@ describe('upload → select chapters → illustrated whole-book conversion', () 
   it('rejects an invalid file without uploading', async () => {
     const view = mountPage()
     await chooseFile(view, new File(['text'], 'notes.txt'))
-    expect(view.text()).toContain('请选择 EPUB 格式')
+    expect(view.text()).toContain('Choose a file in EPUB format')
     expect(mock.history.post).toHaveLength(0)
   })
   it('uploads once and reads the free catalog with no automatic export or paid submission', async () => {

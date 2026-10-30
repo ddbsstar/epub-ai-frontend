@@ -32,14 +32,14 @@ describe('page routing', () => {
       global: { plugins: [router, [VueQueryPlugin, { queryClient }]] },
     })
     try {
-      expect(wrapper.text()).toContain('这一页，还没有写下。')
+      expect(wrapper.text()).toContain('This page has not been written.')
       await wrapper.get('a').trigger('click')
       await flushPromises()
       await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('home'))
-      expect(wrapper.text()).toContain('更漂亮，更统一。')
-      expect(wrapper.text()).toContain('当前提供一套统一排版')
-      expect(wrapper.text()).not.toContain('AI 识别')
-      expect(wrapper.text()).not.toContain('选一种风格')
+      expect(wrapper.text()).toContain('The same book.')
+      expect(wrapper.text()).toContain('One consistent layout')
+      expect(wrapper.text()).not.toMatch(/\p{Script=Han}/u)
+      expect(wrapper.get('.epub-device-disclaimer').text()).toContain('Design illustration')
       expect(mock.history.get).toHaveLength(0)
     } finally {
       wrapper.unmount()
@@ -63,17 +63,20 @@ describe('page routing', () => {
       await flushPromises()
       await vi.waitFor(() => {
         expect(router.currentRoute.value.name).toBe('upload')
-        expect(wrapper.text()).toContain('下一本好看的书，')
+        expect(wrapper.text()).toContain('Your next read,')
       })
       expect(wrapper.findAll('main')).toHaveLength(1)
-      expect(wrapper.get('.epub-breadcrumb [aria-current="page"]').text()).toBe('开始美化')
+      expect(wrapper.get('.epub-breadcrumb [aria-current="page"]').text()).toBe('Format your EPUB')
       expect(wrapper.find('input[type="file"]').exists()).toBe(true)
       expect(wrapper.get('.upload-download').attributes('disabled')).toBeDefined()
+      expect(wrapper.text()).not.toMatch(/\p{Script=Han}/u)
+      for (const element of wrapper.findAll('[aria-label]'))
+        expect(element.attributes('aria-label')).not.toMatch(/\p{Script=Han}/u)
 
       await wrapper.get('.epub-breadcrumb a').trigger('click')
       await flushPromises()
       await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('home'))
-      expect(wrapper.text()).toContain('更漂亮，更统一。')
+      expect(wrapper.text()).toContain('The same book.')
       expect(mock.history.get).toHaveLength(0)
       expect(mock.history.post).toHaveLength(0)
     } finally {

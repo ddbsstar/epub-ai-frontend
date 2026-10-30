@@ -1,5 +1,9 @@
+<script setup lang="ts">
+import { copy } from '@/content/en'
+</script>
+
 <template>
-  <section class="epub-device-stage" id="epub-design" aria-label="Kindle 版式设计示意">
+  <section class="epub-device-stage" id="epub-design" :aria-label="copy.demoLabel">
     <div class="epub-device-note"><span>THE ART OF A QUIET PAGE</span><i></i></div>
     <div class="epub-device-floor" aria-hidden="true"></div>
     <div class="epub-kindle-perspective">
@@ -8,8 +12,10 @@
         <div class="epub-kindle-side" aria-hidden="true"></div>
         <div class="epub-kindle-front">
           <div class="epub-kindle-screen">
-            <article class="epub-reader-page epub-reader-after" aria-label="美化后的原创样章">
-              <div class="epub-reader-running">雨后的远行<span>THE QUIET JOURNEY</span></div>
+            <article class="epub-reader-page epub-reader-after" :aria-label="copy.demoArticleLabel">
+              <div class="epub-reader-running">
+                {{ copy.demoBook }}<span>AN ORIGINAL SAMPLE</span>
+              </div>
               <svg class="epub-botanical" viewBox="0 0 100 64" fill="none" aria-hidden="true">
                 <path
                   d="M49 57c1-17 1-32 8-49M50 44C37 36 27 30 17 20M51 35c14-7 24-12 33-22M48 54C37 50 28 45 23 38"
@@ -21,18 +27,18 @@
                   d="M50 58c9-7 15-10 23-11M61 52c2-6 5-10 10-10 0 6-3 9-10 10ZM67 49c5 4 10 4 14 1-5-4-9-5-14-1Z"
                 />
               </svg>
-              <p class="epub-reader-chapter">第七章</p>
-              <h2>归途</h2>
+              <p class="epub-reader-chapter">{{ copy.demoChapter }}</p>
+              <h2>{{ copy.demoHeading }}</h2>
               <div class="epub-reader-rule" aria-hidden="true">
                 <span></span><i>✧</i><span></span>
               </div>
-              <p class="epub-reader-lead">雨停的时候，山间重新有了光。</p>
+              <p class="epub-reader-lead">{{ copy.demoLead }}</p>
               <p class="epub-reader-prose">
-                他把书合上，望向窗外。屋檐上的水滴沿着旧日的节奏落下，远处的小路，慢慢从雾里显现。
+                {{ copy.demoProseFirst }}
               </p>
-              <blockquote>有些旅程并不为了抵达。</blockquote>
+              <blockquote>{{ copy.demoQuote }}</blockquote>
               <p class="epub-reader-prose">
-                走过长长的路，我们才学会，在平常的日子里，看见微小而确定的美。
+                {{ copy.demoProseSecond }}
               </p>
               <div class="epub-reader-folio">— &nbsp; 07 &nbsp; —</div>
             </article>
@@ -44,14 +50,18 @@
     <div class="epub-comparison">
       <div class="epub-comparison-copy">
         <span class="epub-comparison-index">01</span>
-        <p>同一段文字，<br /><strong>两种阅读感受。</strong></p>
+        <p>
+          {{ copy.demoSame }}<br /><strong>{{ copy.demoFeeling }}</strong>
+        </p>
       </div>
       <div class="epub-switch">
-        <span class="epub-switch-label">原书</span>
-        <span class="epub-switch-label is-active">美化后<span aria-hidden="true">✦</span></span>
+        <span class="epub-switch-label">{{ copy.demoOriginal }}</span>
+        <span class="epub-switch-label is-active"
+          >{{ copy.demoAfter }}<span aria-hidden="true">✦</span></span
+        >
       </div>
     </div>
-    <p class="epub-device-disclaimer">原创样章 · 版式设计示意</p>
+    <p class="epub-device-disclaimer">{{ copy.demoDisclaimer }}</p>
   </section>
 </template>
 

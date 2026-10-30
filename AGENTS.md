@@ -1,5 +1,7 @@
 # Frontend development
 
+- Git workflow: create a new branch for each task, push that branch and open a pull request targeting `main`. Never commit or push directly to `main`, force-push it, or merge a pull request without the user's instruction.
+
 - Use Node.js >=24.15 and `npm ci` with the committed lockfile.
 - Keep views in `src/views`, reusable UI in `src/components`, and routing in `src/router`.
 - Use TanStack Vue Query for remote state and Pinia for client state. Do not duplicate API cache state in a store.

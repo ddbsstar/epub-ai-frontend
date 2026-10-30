@@ -164,7 +164,7 @@ describe('EPUB protocol', () => {
   })
 
   it('rejects empty, wrong-format and oversized files before uploading', () => {
-    expect(validateEpubFile(new File([], 'empty.epub'))).toContain('空')
+    expect(validateEpubFile(new File([], 'empty.epub'))).toContain('empty')
     expect(validateEpubFile(new File(['x'], 'book.zip'))).toContain('EPUB')
     const large = new File(['x'], 'large.epub')
     Object.defineProperty(large, 'size', { value: MAX_EPUB_BYTES + 1 })

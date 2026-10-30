@@ -67,6 +67,6 @@ describe('backend health status', () => {
     const view = mountStatus()
     await flushPromises()
     await vi.waitFor(() => expect(view.text()).toContain('后端暂未连接'))
-    expect(view.text()).toContain('服务返回的数据格式异常')
+    expect(view.text()).toContain('The service returned an unexpected response')
   })
 })

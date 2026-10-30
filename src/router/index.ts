@@ -1,3 +1,4 @@
+import { copy } from '@/content/en'
 import { createRouter, createWebHistory, type RouterHistory } from 'vue-router'
 
 export function createAppRouter(
@@ -10,13 +11,13 @@ export function createAppRouter(
         path: '/',
         name: 'home',
         component: () => import('@/views/HomeView.vue'),
-        meta: { title: 'EPUB AI · 让喜欢的书更漂亮、更统一' },
+        meta: { title: copy.homePageTitle },
       },
       {
         path: '/upload',
         name: 'upload',
         component: () => import('@/views/UploadView.vue'),
-        meta: { title: '开始美化 · EPUB AI' },
+        meta: { title: copy.uploadPageTitle },
       },
       ...(import.meta.env.DEV
         ? [
@@ -24,7 +25,7 @@ export function createAppRouter(
               path: '/illustrate',
               name: 'illustrate',
               component: () => import('@/views/IllustrationView.vue'),
-              meta: { title: '插画实验 · EPUB AI' },
+              meta: { title: copy.labPageTitle },
             },
           ]
         : []),
@@ -32,7 +33,7 @@ export function createAppRouter(
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('@/views/NotFoundView.vue'),
-        meta: { title: '页面未找到 · EPUB AI' },
+        meta: { title: copy.notFoundPageTitle },
       },
     ],
     scrollBehavior: () => ({ top: 0 }),

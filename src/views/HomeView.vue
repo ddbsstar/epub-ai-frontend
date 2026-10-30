@@ -1,24 +1,25 @@
 <script setup lang="ts">
+import { copy } from '@/content/en'
 import KindlePreview from '@/components/KindlePreview.vue'
 import { publicEnv } from '@/config/env'
 
 const features = [
   {
     number: '01',
-    title: '整理章节与段落',
-    description: '统一标题、章首与引文，\n让适用的版式重新有序。',
+    title: copy.structureTitle,
+    description: copy.structureDescription,
     note: 'A SENSE OF STRUCTURE',
   },
   {
     number: '02',
-    title: '保留阅读器里的习惯',
-    description: '正文大小、字体与行距，\n仍由你的阅读器调整。',
+    title: copy.readerTitle,
+    description: copy.readerDescription,
     note: 'READ YOUR OWN WAY',
   },
   {
     number: '03',
-    title: '版式焕新，原文保留',
-    description: '保留文字、图片与目录，\n专注改变阅读呈现。',
+    title: copy.preservationTitle,
+    description: copy.preservationDescription,
     note: 'SAME WORDS, NEW FEELING',
   },
 ]
@@ -29,23 +30,25 @@ const features = [
     <section class="epub-hero" aria-labelledby="epub-title">
       <div class="epub-hero-copy">
         <div class="epub-eyebrow">
-          <span aria-hidden="true"></span>EPUB 排版 · 为日常阅读整理细节
-          <span v-if="publicEnv.publicBeta" class="epub-beta-badge">公开试用</span>
+          <span aria-hidden="true"></span>{{ copy.homeEyebrow }}
+          <span v-if="publicEnv.publicBeta" class="epub-beta-badge">{{ copy.publicBeta }}</span>
         </div>
-        <h1 id="epub-title">让喜欢的书，<br /><span>更漂亮，更统一。</span></h1>
+        <h1 id="epub-title">
+          {{ copy.heroFirst }}<br /><span>{{ copy.heroSecond }}</span>
+        </h1>
         <p class="epub-description">
-          上传已有 EPUB，整理一本书的阅读节奏。<br />
-          统一适用的标题、引文与章节细节，复杂内容保留原样。
+          {{ copy.heroDescriptionFirst }}<br />
+          {{ copy.heroDescriptionSecond }}
         </p>
-        <div class="epub-actions" aria-label="功能入口">
+        <div class="epub-actions" :aria-label="copy.actionsLabel">
           <RouterLink class="epub-action epub-primary" :to="{ name: 'upload' }">
-            开始美化
+            {{ copy.start }}
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 12h15m-6-6 6 6-6 6" />
             </svg>
           </RouterLink>
           <button class="epub-action epub-secondary" type="button" disabled>
-            查看排版效果
+            {{ copy.viewExample }}
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6 18 18 6M6 6h12v12" />
             </svg>
@@ -53,14 +56,14 @@ const features = [
         </div>
         <div class="epub-hero-footnote">
           <span class="epub-fine-star" aria-hidden="true">✳</span>
-          <span>当前提供一套统一排版 · 不改写原文</span>
+          <span>{{ copy.oneStyle }}</span>
         </div>
       </div>
       <KindlePreview />
     </section>
     <section class="epub-features" aria-labelledby="epub-features-title">
       <div class="epub-features-heading">
-        <h2 id="epub-features-title">好版式，藏在每一个细节里。</h2>
+        <h2 id="epub-features-title">{{ copy.detailsTitle }}</h2>
         <span>SMALL DETAILS. A BETTER READ.</span>
       </div>
       <div class="epub-feature-row">
@@ -97,6 +100,7 @@ const features = [
 }
 .epub-eyebrow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   color: #787566;
@@ -140,6 +144,7 @@ const features = [
 }
 .epub-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 13px;
   margin-top: 35px;
