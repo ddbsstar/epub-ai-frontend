@@ -11,7 +11,7 @@ ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 ENV VITE_PUBLIC_BETA=${VITE_PUBLIC_BETA}
 RUN npm run build
 
-FROM nginx:1.30.6-alpine AS runtime
+FROM nginx:1.31.8-alpine AS runtime
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 USER nginx
